@@ -97,79 +97,31 @@ def home():
     * **Data source:** [CoinMarketCap](http://coinmarketcap.com).
     """)
     
-    #---------------------------------#
-    # Sidebar + Main panel
-    col1.header('Input Options')
+    expander_bar = st.beta_expander("What is Cryptocurrency?",expanded=True)
+    expander_bar.markdown("""
+    - Cryptocurrency takes the form of digital assets
 
-    ## Sidebar - Currency price unit
-    currency_price_unit = col1.selectbox('Select currency for price', ('USD', 'BTC', 'ETH'))
-    df = load_data(currency_price_unit)
-    sorted_coin = sorted( df['coin_symbol'] )
-    selected_coin = col1.multiselect('Cryptocurrency', sorted_coin, sorted_coin)
-    
-    ## Sidebar - Cryptocurrency selections
-    df_selected_coin = df[ (df['coin_symbol'].isin(selected_coin)) ] # Filtering data
+    - Buyers use money to buy assets (or a part of an asset)
 
-    ## Sidebar - Number of coins to display
-    num_coin = col1.slider('Display Top N Coins', 1, 100, 100)
-    df_coins = df_selected_coin[:num_coin]
+    - Buyers than exchange the assets online for goods or services
 
-    ## Sidebar - Percent change timeframe
-    percent_timeframe = col1.selectbox('Percent change time frame',
-                                        ['7d','24h', '1h'])
-    percent_dict = {"7d":'percentChange7d',"24h":'percentChange24h',"1h":'percentChange1h'}
-    selected_percent_timeframe = percent_dict[percent_timeframe]
+    ### Think of an asset like a chip at a casino.
+    When you get to a casino (or Chuck E. Cheese, if that's more your vibe), you exchange your money for chips. You can then use your chips to play the games.
 
-    ## Sidebar - Sorting values
-    sort_values = col1.selectbox('Sort values?', ['Yes', 'No'])
+    In this case, the casino chips are the assets, and the games are the good you are purchasing.
+    """)
 
-    col2.subheader('Price Data of Selected Cryptocurrency')
-    col2.write('Data Dimension: ' + str(df_selected_coin.shape[0]) + ' rows and ' + str(df_selected_coin.shape[1]) + ' columns.')
+    expander_bar = st.beta_expander("How Does It Work?",expanded=True)
+    expander_bar.markdown("""
+    - ### Transactions are verified using Blockchain
 
-    col2.dataframe(df_coins)
+- Blockchain transactions are decentralized, meaning they're spread across many computers to manage and record transactions 
 
-    # Download CSV data
-    # https://discuss.streamlit.io/t/how-to-download-file-in-streamlit/1806
+- Because Blockchain transactions rely on many computers, they are considered more secure than centralized currencies 
 
-    col2.markdown(filedownload(df_selected_coin), unsafe_allow_html=True)
 
-    #---------------------------------#
-    # Preparing data for Bar plot of % Price change
-    col2.subheader('Table of % Price Change')
-    df_change = pd.concat([df_coins.coin_symbol, df_coins.percentChange1h, df_coins.percentChange24h, df_coins.percentChange7d], axis=1)
-    df_change = df_change.set_index('coin_symbol')
-    df_change['positive_percent_change_1h'] = df_change['percentChange1h'] > 0
-    df_change['positive_percent_change_24h'] = df_change['percentChange24h'] > 0
-    df_change['positive_percent_change_7d'] = df_change['percentChange7d'] > 0
-    col2.dataframe(df_change)
+    """)
 
-    # Conditional creation of Bar plot (time frame)
-    col3.subheader('Bar plot of % Price Change')
-
-    if percent_timeframe == '7d':
-        if sort_values == 'Yes':
-            df_change = df_change.sort_values(by=['percentChange7d'])
-        col3.write('*7 days period*')
-        plt.figure(figsize=(5,25))
-        plt.subplots_adjust(top = 1, bottom = 0)
-        df_change['percentChange7d'].plot(kind='barh', color=df_change.positive_percent_change_7d.map({True: 'g', False: 'r'}))
-        col3.pyplot(plt)
-    elif percent_timeframe == '24h':
-        if sort_values == 'Yes':
-            df_change = df_change.sort_values(by=['percentChange24h'])
-        col3.write('*24 hour period*')
-        plt.figure(figsize=(5,25))
-        plt.subplots_adjust(top = 1, bottom = 0)
-        df_change['percentChange24h'].plot(kind='barh', color=df_change.positive_percent_change_24h.map({True: 'g', False: 'r'}))
-        col3.pyplot(plt)
-    else:
-        if sort_values == 'Yes':
-            df_change = df_change.sort_values(by=['percentChange1h'])
-        col3.write('*1 hour period*')
-        plt.figure(figsize=(5,25))
-        plt.subplots_adjust(top = 1, bottom = 0)
-        df_change['percentChange1h'].plot(kind='barh', color=df_change.positive_percent_change_1h.map({True: 'g', False: 'r'}))
-        col3.pyplot(plt)
 
 def plots_page():
     st.title(pages[1])
